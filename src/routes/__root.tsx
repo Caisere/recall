@@ -1,8 +1,10 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { ThemeProvider } from '#/components/web/theme-provider.tsx'
 
 import appCss from '../styles.css?url'
+import { ToggleButton } from '#/components/web/toggle-button'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -35,7 +37,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ThemeProvider>
+          <ToggleButton />
+          <main>{children}</main>
+        </ThemeProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
