@@ -11,13 +11,35 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
+  FieldError,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Link } from '@tanstack/react-router'
+import { useForm } from '@tanstack/react-form'
+import { loginSchema } from '#/schemas/auth.schema'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 
 export function LoginForm() {
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  function toggleShowPassword() {
+    setShowPassword(!showPassword)
+  }
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    validators: {
+      onSubmit: loginSchema,
+    },
+    onSubmit: ({ value }) => {
+      alert(JSON.stringify(value, null, 2))
+    },
+  })
+
   return (
-    <Card >
+    <Card>
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription>
@@ -25,29 +47,89 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+        >
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </Field>
-            <Field>
-              <div className="flex items-center">
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <a
-                  href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
-              </div>
-              <Input id="password" type="password" required />
-            </Field>
+            <form.Field
+              name="email"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="example@mail.com"
+                      autoComplete="on"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+            <form.Field
+              name="password"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <div className="flex items-center">
+                      <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id={field.name}
+                        type={showPassword ? 'text' : 'password'}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        placeholder="*************"
+                        autoComplete="on"
+                      />
+                      <div
+                        className="absolute top-1.5 right-2"
+                        onClick={toggleShowPassword}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </div>
+                    </div>
+                    <FieldDescription>
+                      Must be at least 8 characters long.
+                    </FieldDescription>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+            <div>
+              <Link
+                to="/"
+                className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+              >
+                Forgot your password?
+              </Link>
+            </div>
             <Field>
               <Button type="submit">Login</Button>
               <FieldDescription className="text-center">

@@ -1,3 +1,4 @@
+import { signupSchema } from '#/schemas/auth.schema'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -9,13 +10,34 @@ import {
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { useForm } from '@tanstack/react-form'
 import { Link } from '@tanstack/react-router'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 
 export function SignupForm() {
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+  const form = useForm({
+    defaultValues: {
+      fullName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validators: {
+      onSubmit: signupSchema,
+    },
+    onSubmit: ({ value }) => {
+      alert(JSON.stringify(value, null, 2))
+    },
+  })
+
   return (
     <Card>
       <CardHeader>
@@ -25,40 +47,158 @@ export function SignupForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+        >
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" required />
-              <FieldDescription>
-                Must be at least 8 characters long.
-              </FieldDescription>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm Password
-              </FieldLabel>
-              <Input id="confirm-password" type="password" required />
-              <FieldDescription>Please confirm your password.</FieldDescription>
-            </Field>
+            <form.Field
+              name="fullName"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="John Doe"
+                      autoComplete="on"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+            <form.Field
+              name="email"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="example@mail.com"
+                      autoComplete="on"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+            <form.Field
+              name="password"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <div className="flex items-center">
+                      <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id={field.name}
+                        type={showPassword ? 'text' : 'password'}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        placeholder="*************"
+                        autoComplete="on"
+                      />
+                      <div
+                        className="absolute top-1.5 right-2"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </div>
+                    </div>
+                    <FieldDescription>
+                      Must be at least 8 characters long.
+                    </FieldDescription>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
+            <form.Field
+              name="confirmPassword"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <div className="flex items-center">
+                      <FieldLabel htmlFor={field.name}>
+                        Confirm Password
+                      </FieldLabel>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id={field.name}
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        placeholder="*************"
+                        autoComplete="on"
+                      />
+                      <div
+                        className="absolute top-1.5 right-2"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </div>
+                    </div>
+                    <FieldDescription>
+                      Please confirm your password.
+                    </FieldDescription>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
             <FieldGroup>
               <Field>
                 <Button type="submit">Create Account</Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <Link  to="/login">Sign in</Link>
+                  Already have an account? <Link to="/login">Sign in</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
