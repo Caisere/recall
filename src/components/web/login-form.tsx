@@ -14,13 +14,16 @@ import {
   FieldError,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { loginSchema } from '#/schemas/auth.schema'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
+import { authClient } from '#/lib/auth-client'
+import { toast } from '../ui/toast'
 
 export function LoginForm() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState<boolean>(false)
   function toggleShowPassword() {
     setShowPassword(!showPassword)
@@ -33,8 +36,27 @@ export function LoginForm() {
     validators: {
       onSubmit: loginSchema,
     },
-    onSubmit: ({ value }) => {
-      alert(JSON.stringify(value, null, 2))
+    onSubmit: async ({ value }) => {
+      await authClient.signIn.email({
+        email: value.email,
+        password: value.password,
+        callbackURL: '/dashboard',
+        fetchOptions: {
+          onSuccess: () => {
+            navigate({ to: '/dashboard' })
+            toast.add({
+              type: 'info',
+              description: `Welcome 🥰, Account created successfully!`,
+            })
+          },
+          onError: ({ error }) => {
+            toast.add({
+              type: 'error',
+              description: error.message,
+            })
+          },
+        },
+      })
     },
   })
 

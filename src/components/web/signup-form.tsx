@@ -1,4 +1,4 @@
-import { authClient } from '#/lib/auth-client'
+import { authClient, signUp } from '#/lib/auth-client'
 import { signupSchema } from '#/schemas/auth.schema'
 import { Button } from '@/components/ui/button'
 import {
@@ -37,7 +37,7 @@ export function SignupForm() {
       onSubmit: signupSchema,
     },
     onSubmit: async ({ value }) => {
-      await authClient.signUp.email({
+      await signUp.email({
         name: value.fullName,
         email: value.email,
         password: value.password,
