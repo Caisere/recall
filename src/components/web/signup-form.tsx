@@ -1,3 +1,4 @@
+import { authClient } from '#/lib/auth-client'
 import { signupSchema } from '#/schemas/auth.schema'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,11 +17,13 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useForm } from '@tanstack/react-form'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from '../ui/toast'
 
 export function SignupForm() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const form = useForm({
@@ -33,8 +36,28 @@ export function SignupForm() {
     validators: {
       onSubmit: signupSchema,
     },
-    onSubmit: ({ value }) => {
-      alert(JSON.stringify(value, null, 2))
+    onSubmit: async ({ value }) => {
+      await authClient.signUp.email({
+        name: value.fullName,
+        email: value.email,
+        password: value.password,
+        callbackURL: '/dashboard',
+        fetchOptions: {
+          onSuccess: ({ data }) => {
+            navigate({ to: '/dashboard' })
+            toast.add({
+              type: 'info',
+              description: `Welcome ${data}, Account created successfully!`,
+            })
+          },
+          onError: ({ error }) => {
+            toast.add({
+              type: 'error',
+              description: error.message,
+            })
+          },
+        },
+      })
     },
   })
 
