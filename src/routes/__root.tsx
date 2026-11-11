@@ -1,10 +1,9 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { ThemeProvider } from '#/components/web/theme-provider.tsx'
 
 import appCss from '../styles.css?url'
-import { ToggleButton } from '#/components/web/toggle-button'
+import { ThemeProvider } from '#/components/web/theme-provider'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -32,15 +31,12 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
         <HeadContent />
       </head>
       <body>
-        <ThemeProvider>
-          <ToggleButton />
-          <main>{children}</main>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
