@@ -24,6 +24,12 @@ function RouteComponent() {
                   description: 'SignOut Successful',
                 })
               },
+              onError: ({ error }) => {
+                toast.add({
+                  type: 'error',
+                  description: error.message,
+                })
+              },
             },
           })
         }}

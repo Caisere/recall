@@ -37,13 +37,13 @@ function RouteComponent() {
             bring your ideas to life.
           </p>
 
-          <div className="relative mt-12 max-w-md rounded-2xl border border-white/10 bg-white/[0.06] p-5 shadow-2xl shadow-black/20 backdrop-blur-sm">
+          <div className="relative mt-12 max-w-md rounded-2xl border border-white/10 bg-white/6 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm">
             <div className="absolute -top-5 right-8 flex size-11 items-center justify-center rounded-xl border border-sky-200/20 bg-sky-300/15 text-sky-200 shadow-lg shadow-sky-950/40">
               <Fingerprint className="size-5" />
             </div>
             <div className="flex items-start gap-4 pr-8">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300">
-                <LockKeyhole className="size-[18px]" />
+                <LockKeyhole className="size-4.5" />
               </div>
               <div>
                 <p className="text-sm font-medium text-white">

@@ -19,7 +19,7 @@ import { useForm } from '@tanstack/react-form'
 import { loginSchema } from '#/schemas/auth.schema'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
-import { authClient } from '#/lib/auth-client'
+import { signIn } from '#/lib/auth-client'
 import { toast } from '../ui/toast'
 
 export function LoginForm() {
@@ -37,16 +37,15 @@ export function LoginForm() {
       onSubmit: loginSchema,
     },
     onSubmit: async ({ value }) => {
-      await authClient.signIn.email({
+      await signIn.email({
         email: value.email,
         password: value.password,
-        callbackURL: '/dashboard',
         fetchOptions: {
-          onSuccess: () => {
+          onSuccess: ({ data }) => {
             navigate({ to: '/dashboard' })
             toast.add({
               type: 'info',
-              description: `Welcome 🥰, Account created successfully!`,
+              description: `Welcome ${data.user.name} 🥰, Sign-In Successful!`,
             })
           },
           onError: ({ error }) => {
@@ -153,7 +152,14 @@ export function LoginForm() {
               </Link>
             </div>
             <Field>
-              <Button type="submit">Login</Button>
+              <form.Subscribe
+                selector={(state) => [state.canSubmit, state.isSubmitting]}
+                children={([canSubmit, isSubmitting]) => (
+                  <Button type="submit" disabled={!canSubmit || isSubmitting}>
+                    {isSubmitting ? 'Logging In...' : 'Login'}
+                  </Button>
+                )}
+              />
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <Link to="/signup">Sign up</Link>
               </FieldDescription>

@@ -1,4 +1,4 @@
-import { authClient, signUp } from '#/lib/auth-client'
+import { signUp } from '#/lib/auth-client'
 import { signupSchema } from '#/schemas/auth.schema'
 import { Button } from '@/components/ui/button'
 import {
@@ -47,7 +47,7 @@ export function SignupForm() {
             navigate({ to: '/dashboard' })
             toast.add({
               type: 'info',
-              description: `Welcome ${data}, Account created successfully!`,
+              description: `Welcome ${data.user.name}, Account created successfully!`,
             })
           },
           onError: ({ error }) => {
@@ -219,7 +219,14 @@ export function SignupForm() {
             />
             <FieldGroup>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  children={([canSubmit, isSubmitting]) => (
+                    <Button type="submit" disabled={!canSubmit || isSubmitting}>
+                      {isSubmitting ? 'Creating...' : 'Create Account'}
+                    </Button>
+                  )}
+                />
                 <FieldDescription className="px-6 text-center">
                   Already have an account? <Link to="/login">Sign in</Link>
                 </FieldDescription>
