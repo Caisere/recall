@@ -26,6 +26,7 @@ export function SignupForm() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
+  
   const form = useForm({
     defaultValues: {
       fullName: '',

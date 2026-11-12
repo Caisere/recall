@@ -25,9 +25,7 @@ import { toast } from '../ui/toast'
 export function LoginForm() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState<boolean>(false)
-  function toggleShowPassword() {
-    setShowPassword(!showPassword)
-  }
+
   const form = useForm({
     defaultValues: {
       email: '',
@@ -124,7 +122,9 @@ export function LoginForm() {
                       />
                       <div
                         className="absolute top-1.5 right-2"
-                        onClick={toggleShowPassword}
+                        onClick={() => {
+                          setShowPassword(!showPassword)
+                        }}
                       >
                         {showPassword ? (
                           <EyeOff size={18} />
