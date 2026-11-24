@@ -18,12 +18,13 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { loginSchema } from '#/schemas/auth.schema'
 import { Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { signIn } from '#/lib/auth-client'
 import { toast } from '../ui/toast'
 
 export function LoginForm() {
   const navigate = useNavigate()
+  const [isPending, startTransition] = useTransition()
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const form = useForm({
@@ -34,25 +35,27 @@ export function LoginForm() {
     validators: {
       onSubmit: loginSchema,
     },
-    onSubmit: async ({ value }) => {
-      await signIn.email({
-        email: value.email,
-        password: value.password,
-        fetchOptions: {
-          onSuccess: ({ data }) => {
-            navigate({ to: '/dashboard' })
-            toast.add({
-              type: 'info',
-              description: `Welcome ${data.user.name} 🥰, Sign-In Successful!`,
-            })
+    onSubmit: ({ value }) => {
+      startTransition(async () => {
+        await signIn.email({
+          email: value.email,
+          password: value.password,
+          fetchOptions: {
+            onSuccess: ({ data }) => {
+              navigate({ to: '/dashboard' })
+              toast.add({
+                type: 'info',
+                description: `Welcome ${data.user.name} 🥰, Sign-In Successful!`,
+              })
+            },
+            onError: ({ error }) => {
+              toast.add({
+                type: 'error',
+                description: error.message,
+              })
+            },
           },
-          onError: ({ error }) => {
-            toast.add({
-              type: 'error',
-              description: error.message,
-            })
-          },
-        },
+        })
       })
     },
   })
@@ -155,8 +158,11 @@ export function LoginForm() {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                    {isSubmitting ? 'Logging In...' : 'Login'}
+                  <Button
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting || isPending}
+                  >
+                    {isSubmitting || isPending ? 'Logging In...' : 'Login'}
                   </Button>
                 )}
               />

@@ -19,14 +19,15 @@ import { Input } from '@/components/ui/input'
 import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { toast } from '../ui/toast'
 
 export function SignupForm() {
   const navigate = useNavigate()
+  const [isPending, startTransition] = useTransition()
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-  
+
   const form = useForm({
     defaultValues: {
       fullName: '',
@@ -37,27 +38,29 @@ export function SignupForm() {
     validators: {
       onSubmit: signupSchema,
     },
-    onSubmit: async ({ value }) => {
-      await signUp.email({
-        name: value.fullName,
-        email: value.email,
-        password: value.password,
-        callbackURL: '/dashboard',
-        fetchOptions: {
-          onSuccess: ({ data }) => {
-            navigate({ to: '/dashboard' })
-            toast.add({
-              type: 'info',
-              description: `Welcome ${data.user.name}, Account created successfully!`,
-            })
+    onSubmit: ({ value }) => {
+      startTransition(async () => {
+        await signUp.email({
+          name: value.fullName,
+          email: value.email,
+          password: value.password,
+          callbackURL: '/dashboard',
+          fetchOptions: {
+            onSuccess: ({ data }) => {
+              navigate({ to: '/dashboard' })
+              toast.add({
+                type: 'info',
+                description: `Welcome ${data.user.name}, Account created successfully!`,
+              })
+            },
+            onError: ({ error }) => {
+              toast.add({
+                type: 'error',
+                description: error.message,
+              })
+            },
           },
-          onError: ({ error }) => {
-            toast.add({
-              type: 'error',
-              description: error.message,
-            })
-          },
-        },
+        })
       })
     },
   })
@@ -223,8 +226,13 @@ export function SignupForm() {
                 <form.Subscribe
                   selector={(state) => [state.canSubmit, state.isSubmitting]}
                   children={([canSubmit, isSubmitting]) => (
-                    <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                      {isSubmitting ? 'Creating...' : 'Create Account'}
+                    <Button
+                      type="submit"
+                      disabled={!canSubmit || isSubmitting || isPending}
+                    >
+                      {isSubmitting || isPending
+                        ? 'Creating...'
+                        : 'Create Account'}
                     </Button>
                   )}
                 />
