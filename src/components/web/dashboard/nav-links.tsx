@@ -14,7 +14,6 @@ import type { NavLinksProps } from '#/types'
 export function NavLinks({ routes }: NavLinksProps) {
   const { isMobile } = useSidebar()
 
-
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupContent>
@@ -22,7 +21,15 @@ export function NavLinks({ routes }: NavLinksProps) {
           {routes.map((route) => (
             <SidebarMenuItem key={route.to}>
               <SidebarMenuButton size="sm">
-                <Link to={route.to} className="flex gap-2 items-center">
+                <Link
+                  activeProps={{
+                    // 'data-active': true,
+                    className: `font-bold text-stone-500`,
+                  }}
+                  to={route.to}
+                  activeOptions={route.activeOptions}
+                  className="flex gap-2 items-center"
+                >
                   <route.icon />
                   <span>{route.title}</span>
                 </Link>

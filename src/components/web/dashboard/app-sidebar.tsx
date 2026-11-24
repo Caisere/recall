@@ -39,17 +39,19 @@ const routes: NavLinksProps['routes'] = linkOptions([
     title: 'Items',
     to: '/dashboard/items',
     icon: BookmarkIcon,
-    
+    activeOptions: { exact: false },
   },
   {
     title: 'Import',
     to: '/dashboard/import',
     icon: Import,
+    activeOptions: { exact: false },
   },
   {
     title: 'Discover',
     to: '/dashboard/discover',
     icon: Compass,
+    activeOptions: { exact: false },
   },
 ])
 
